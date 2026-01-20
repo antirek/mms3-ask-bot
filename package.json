@@ -1,0 +1,26 @@
+{
+  "name": "mms3-ask-bot",
+  "version": "1.0.0",
+  "description": "GigaChat AI bot for mms3/chat3 document processing and Q&A",
+  "type": "module",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "start:user-bot": "npm run start --workspace=packages/user-bot",
+    "start:data-backend": "npm run start --workspace=packages/data-backend",
+    "start:all": "concurrently \"npm run start:user-bot\" \"npm run start:data-backend\"",
+    "dev:user-bot": "npm run dev --workspace=packages/user-bot",
+    "dev:data-backend": "npm run dev --workspace=packages/data-backend",
+    "dev:data-ui": "npm run dev --workspace=packages/data-ui",
+    "dev:all": "concurrently \"npm run dev:user-bot\" \"npm run dev:data-backend\" \"npm run dev:data-ui\"",
+    "build:data-ui": "npm run build --workspace=packages/data-ui",
+    "install:all": "npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "author": "",
+  "license": "ISC"
+}

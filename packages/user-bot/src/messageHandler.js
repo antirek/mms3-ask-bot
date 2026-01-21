@@ -148,7 +148,29 @@ export class MessageHandler {
 
         // Отправляем ответ пользователю
         const responseText = this.buildSuccessResponse(intentResult);
-        await this.sendResponse(dialogId, responseText);
+        const sendResult = await this.sendResponse(dialogId, responseText);
+
+        // Сохраняем данные о токенах и модели в мета теги сообщения
+        if (sendResult.success && sendResult.messageId) {
+          if (intentResult.usage) {
+            await this.metaManager.setMessageMetaKey(
+              sendResult.messageId,
+              'gigachat_usage',
+              intentResult.usage,
+              { dataType: 'object' }
+            );
+            console.log(`Сохранены данные о токенах в мета тег сообщения ${sendResult.messageId}`);
+          }
+          if (intentResult.model) {
+            await this.metaManager.setMessageMetaKey(
+              sendResult.messageId,
+              'gigachat_model',
+              intentResult.model,
+              { dataType: 'string' }
+            );
+            console.log(`Сохранена модель в мета тег сообщения ${sendResult.messageId}: ${intentResult.model}`);
+          }
+        }
 
         return { success: true, handled: true, intent: intentResult.intent, category: intentResult.intent };
       } else if (intentResult.status === 'insufficient_data') {

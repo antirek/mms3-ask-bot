@@ -199,15 +199,27 @@ ${contextLines.join('\n')}
       // Парсим ответ - берем content из choices[0].message.content
       const answer = this.extractAnswerFromResponse(response);
       
-      console.log(`Ответ получен с использованием ${fileIds.length} файлов, длина ответа: ${answer ? answer.length : 0}`);
+      // Извлекаем данные о токенах и модели из response
+      const usage = response?.usage || null;
+      const model = response?.model || null;
       
-      // Возвращаем упрощенный формат ответа
+      console.log(`Ответ получен с использованием ${fileIds.length} файлов, длина ответа: ${answer ? answer.length : 0}`);
+      if (usage) {
+        console.log(`Использовано токенов: ${usage.total_tokens} (prompt: ${usage.prompt_tokens}, completion: ${usage.completion_tokens})`);
+      }
+      if (model) {
+        console.log(`Модель: ${model}`);
+      }
+      
+      // Возвращаем упрощенный формат ответа с данными о токенах и модели
       return {
         success: true,
         status: 'success',
         intent: 'default_intent',
         data: {},
-        answer: answer || 'Не удалось получить ответ от AI'
+        answer: answer || 'Не удалось получить ответ от AI',
+        usage: usage, // Данные о токенах
+        model: model  // Модель
       };
     } catch (error) {
       console.error('Ошибка при классификации намерения с файлами:', error);
@@ -242,12 +254,16 @@ ${contextLines.join('\n')}
           console.log(`Повторная отправка запроса к GigaChat с ${fileIds.length} прикрепленными файлами:`, fileIds);
           const response = await this.apiClient.sendRequest(this.model, messages, requestOptions);
           const answer = this.extractAnswerFromResponse(response);
+          const usage = response?.usage || null;
+          const model = response?.model || null;
           return {
             success: true,
             status: 'success',
             intent: 'default_intent',
             data: {},
-            answer: answer || 'Не удалось получить ответ от AI'
+            answer: answer || 'Не удалось получить ответ от AI',
+            usage: usage,
+            model: model
           };
         } catch (retryError) {
           console.error('Ошибка при повторной попытке:', retryError);
